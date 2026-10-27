@@ -1,0 +1,322 @@
+\section{精确计数的更紧界}\label{app:quantitative}
+
+我们通过收缩布尔张量网络来证明定理~\ref{thm:main}。
+这两个运行时间反映了网络中导线的数量。
+含有 $m\le Dn$ 个子句的公式给出一个具有 $O_{k,D}(n)$
+条导线的网络。对于任意公式，我们使用
+第~\ref{sec:hashes} 节的奇偶检验。引理~\ref{lem:total-order}
+的次数界使我们能用 $O_k(n\log\log n)$ 条导线来索引其多项式
+提升的乘积中保留的一个单项式。我们在证明它们所用的收缩
+定理之前给出这两种编码。
+
+\subsection{布尔张量收缩}
+\label{subsec:tensor-interface}
+
+布尔张量网络是一个二部多重图 $G$，其中每条边携带一个比特。
+每个顶点 $v$ 有一个关联边的有序列表 $\delta(v)$ 和一个张量
+$T_v$，后者为这些边的每个布尔赋值指派一个环元素。平行边
+具有不同的端口。该网络的\emph{收缩}为
+\[
+ Z=\sum_{x\in\{0,1\}^{E(G)}}\prod_{v\in V(G)} T_v(x|_{\delta(v)}).
+\]
+孤立顶点贡献其标量元素。我们用边数来度量网络的
+大小。
+
+\begin{theorem}[布尔张量收缩]\label{thm:tensor-contraction}
+固定正常数 $C,A,b$。设 $s\ge2$ 为整数，并设
+$\mathcal L$ 是一个二部张量网络的图与张量描述的总长度，
+该网络至多有 $Cs$ 条边且最大度至多为 $\lceil s^{9/10}\rceil$。
+假设顶点数被 $s$ 的某个固定多项式所界，且各元素属于
+\[
+ \mathcal B_{P_0,\ell}
+   =(\mathbb Z/2^{P_0}\mathbb Z)[V]/(V^\ell),
+ \qquad 1\le P_0,\ell\le Cs.
+\]
+假设对每个顶点及其端口的每种布尔取值一致地，其元素可由
+该描述在时间 $(s+\mathcal L)^b2^{A s^{9/10}}$ 与空间
+$(s+\mathcal L)^b$ 内计算出来。那么该收缩可在
+\[
+ (s+\mathcal L)^{O(1)}
+  2^{O(s/\sqrt{\log s})}
+\]
+位运算与 $(s+\mathcal L)^{O(1)}$ 比特空间内确定性计算。
+常数只依赖于假设中的固定界。特别地，
+允许 $\ell=1$。
+\end{theorem}
+
+第~\ref{app:tensor} 节中的算法用沿导线的递归取代单次全局
+泰勒展开。在每次调用时，它形变导线的等同关系，使得在选定的
+插值节点处，只有同一组内的端口发生相互作用。在该节点附近，
+组之间的相互作用按称为模式的变量展开。权重为 $j$ 的模式的
+系数可被 $2^j$ 整除，因此只有总权重低于工作精度的单项式
+才能有贡献。用节点的 2 进赋值渐缩 Hermite 重数，从而
+界定该精度。在 $M$ 条导线与 $u$ 个保留的赋值层级下，
+模式单项式的数目为 $2^{O(M/\sqrt{u})}$，且每个单项式分解为
+至多 $M/8$ 条导线的收缩之积。在递归深度 $d$ 处，
+$M=O(s8^{-d})$ 且 $u=\Theta((\log s)/2^d)$。因此这些指数
+按几何级数求和为 $O(s/\sqrt{\log s})$。
+
+\subsection{固定子句密度}\label{subsec:sharp-fixed-density}
+
+\begin{proof}[定理~\ref{thm:main} 中固定密度界的证明]
+给每个子句一个顶点，该顶点携带其布尔满足表，子句中
+每个不同变量对应一个端口。重言式子句可以删除，空子句
+使计数为零。对于具有 $d\ge1$ 个端口的变量，要求它们的
+比特一致。对 $d=1$ 附加一元张量 $(1,1)$，对 $d=2$ 附加
+二元相等张量。对 $d\ge3$，取一棵具有 $d$ 个外部端口、
+内部顶点为三价相等张量的树。这样的树有 $d-2$ 个内部
+顶点，其端口上的每个公共值唯一地延伸到其所有
+内部边。
+
+至多有 $km$ 个子句端口。该图有 $O_k(n+m)$ 条边和顶点，
+最大度至多为 $\max\{k,3\}$。用二元相等张量把每条边
+细分一次。旧顶点与新顶点构成二部网络的两侧。细分边上
+的两个比特必须相等，因此这保持收缩不变。出现变量上的
+每个满足赋值贡献一，其他每个赋值贡献零。
+
+取 $s=n+m$，在 $\mathbb Z/2^{n+1}\mathbb Z$ 上应用
+定理~\ref{thm:tensor-contraction}，取 $P_0=n+1$ 与 $\ell=1$。
+对固定的 $k$，局部表的大小有界。次数与精度的界对
+所有充分大的 $s$ 成立，而有界实例可直接枚举。若有 $u$ 个
+声明变量未被使用，则把收缩乘以 $2^u$ 并对
+$2^{n+1}$ 取模。其最小非负剩余为 $\#F$，因为
+$0\le\#F\le2^n$。这包括空公式，其空网络的收缩为一。
+时间为 $s^{O_k(1)}2^{O_k(s/\sqrt{\log s})}$，空间为多项式。
+当 $m\le Dn$ 时，有 $n\le s\le(1+D)n$，给出指数
+$O_{k,D}(n/\sqrt{\log n})$。
+\end{proof}
+
+\subsection{任意子句密度}\label{subsec:sharp-dense}
+
+第~\ref{sec:hashes} 节中的稀疏化与贪心行选择把这一情形
+归约为计数稀疏多项式方程的公共零点。我们保留
+第~\ref{sec:setup} 节的奇偶提升。其次数界使我们能用
+$O(n\log\log n)$ 条布尔导线，通过检验—变量关联的
+子集来编码一个单项式。
+
+\begin{lemma}[通过收缩计数稀疏多项式系统]
+\label{lem:tensor-sparse-query}
+固定整数 $k,c\ge1$。设 $P_1,\ldots,P_a$ 是 $\mathbb F_2$ 上
+关于 $n\ge20$ 个声明布尔变量的多项式。假设
+$a\le cn$，且每个 $P_i$ 被列为至多
+$\lceil\log_2 n\rceil^c$ 个次数至多为 $k$ 的单项式。公共零点的
+数目可在 $n^{O_{k,c}(1)}2^{O_{k,c}(n\log\log n/\sqrt{\log n})}$
+位运算与 $n^{O_{k,c}(1)}$ 比特空间内确定性计算。
+\end{lemma}
+
+\begin{proof}
+令 $\lambda=\lceil\log_2 n\rceil$ 与
+$\nu=\lceil\log_2\lambda\rceil$。
+在每个单项式内，把变量的正幂次替换为其一次幂，并按模二
+合并重复的单项式。检验 $i$ 的作用域由其剩余单项式中的
+变量组成。其大小至多为 $k\lambda^c$。
+设 $N_0$ 为各作用域大小之和，其中若变量 $v$ 属于检验 $i$，
+则对 $(i,v)$ 只计一次。于是 $N_0\le ak\lambda^c$。
+以所有可能的方式固定属于多于
+\[
+ D_*=\max\{1,\lceil N_0/n\rceil\}\lceil\sqrt{\lambda}\rceil
+\]
+个作用域的变量。这样的变量至多有 $n/\sqrt{\lambda}$ 个。它们的
+赋值把原计数划分为至多 $2^{n/\sqrt{\lambda}}$ 个分支计数。
+在每个分支上代入固定比特并再次合并重复单项式。检验 $i$ 的
+自由作用域 $I_i$ 的大小仍至多为 $k\lambda^c$，且每个自由
+变量出现在至多 $D_*=\lambda^{O_{k,c}(1)}$ 个作用域中。不出现
+在任何作用域中的自由变量仍保持声明状态。常值一方程使
+分支计数为零。我们可以丢弃常值零方程；若没有剩余方程，
+则该分支的答案为二的自由于变量数目的幂。下文 $a$ 表示
+剩余方程的数目，$n$ 表示原始变量数。
+
+\paragraph{关联上的多项式。}
+给每个满足 $v\in I_i$ 的对 $(i,v)$ 一个自己的未定元
+$z_{iv}$。记 $z_i=(z_{iv})_{v\in I_i}$。用整数系数求规范化
+分支多项式剩余单项式之和，以 $z_{iv}$ 代替 $x_v$，构成
+$\widetilde L_i(z_i)$。我们使用环
+\[
+ \mathcal B=(\mathbb Z/2^p\mathbb Z)[V]/(V^\ell),
+ \qquad p=\ell=n+1 .
+\]
+取 $h(Y)=Y(Y-1)$ 以及引理~\ref{lem:rational-idempotent} 中的
+整系数多项式 $e_j$。将其系数模 $2^p$ 约化，并构成因子
+\[
+ B_i(z_i,V)=\sum_{j=0}^{\ell-1}
+   e_j(\widetilde L_i(z_i))\,h(\widetilde L_i(z_i))^j V^j .
+\]
+设 $\overline B_i$ 为其在 $z_i$ 中的多线性代表，它通过在 $V$ 的
+每个系数中把每个关联未定元的正幂次替换为一次幂而得到。它在
+$z_i$ 的每个布尔赋值上与 $B_i$ 一致。在 $\mathcal B[z]$ 中定义
+$F(z,V)=\prod_i\overline B_i(z_i,V)$。不同检验的关联未定元
+互不相交，因此即使在把同一个布尔 $x_v$ 代入变量 $v$ 的所有
+副本之前，$F$ 也是多线性的。
+
+$\overline B_i$ 中 $V^j$ 的系数的关联次数至多为 $k(1+2j)$，
+因为 $\deg e_j\le1$、$\deg h=2$，且多线性化只会降低单项式的
+次数。$\mathcal B$ 中的乘法只保留满足 $\sum_i j_i\le\ell-1$
+的项。从而 $F$ 中每个关联单项式的次数至多为
+\begin{equation}\label{eq:sharp-incidence-degree}
+ K=k\bigl(a+2(\ell-1)\bigr)=O_{k,c}(n).
+\end{equation}
+设 $\mathcal S_\ell$ 在 $\mathcal B$ 中求 $1,V,\ldots,V^{\ell-1}$
+的系数之和。在 $z_{iv}=x_v$ 处，多线性化因子
+$\overline B_i$ 与规范化分支多项式的 $B_i$ 一致。
+整数 $\widetilde L_i((x_v)_{v\in I_i})$ 与原 $P_i$ 在 $x$ 与
+固定比特处取值具有相同的奇偶性。对这些整数应用
+引理~\ref{lem:total-order} 表明，分支计数模 $2^p$ 同余于
+\begin{equation}\label{eq:sharp-branch-residue}
+ \mathcal S_\ell\left(\sum_x F\bigl((z_{iv}=x_v)_{iv},V\bigr)\right),
+\end{equation}
+其中 $x$ 遍历所有自由布尔赋值。我们在截断环中乘起各检验
+因子之后应用系数求和映射。
+
+\paragraph{索引单项式。}
+分别把检验与自由变量划分为 $J=\lceil n^{1/4}\rceil$ 组，
+每侧各组的大小至多相差一。用 $\mathcal T_g$ 表示检验组，
+$\mathcal X_h$ 表示变量组。一组包含 $O_c(n^{3/4})$ 个对象，
+因此其关联数在任一侧至多为
+$n^{3/4}\lambda^{O_{k,c}(1)}$。设 $N_{gh}$ 为从 $\mathcal T_g$ 到
+$\mathcal X_h$ 的关联数，并设 $N=\sum_{g,h}N_{gh}\le N_0$。
+
+对关联单项式，设 $d_{gh}$ 为其连接组 $g,h$ 的入选关联数。
+枚举满足 $0\le d_{gh}\le N_{gh}$ 与 $\sum_{g,h}d_{gh}\le K$ 的
+整数数组 $(d_{gh})$。至多有
+\[
+ (K+1)^{J^2}=2^{O_{k,c}(\sqrt n\log n)}
+\]
+个数组，可用 $J^2$ 个计数器枚举。对固定数组，这一对存在
+\[
+ C_{gh}=\binom{N_{gh}}{d_{gh}}
+\]
+个指定大小的子集。在两个组顶点之间引
+$\lceil\log_2 C_{gh}\rceil$ 条布尔导线，以字典序索引它们。
+当 $C_{gh}=1$ 时，两个端点使用唯一的子集（可能是整个关联集）
+且不使用导线。任何未使用的比特串给出张量元素零。为解码
+一个有效索引，按顺序取各关联，并用二项式系数计数包含或
+不包含每个关联的可能补全。这些具有多项式比特长度，因此
+解码使用多项式时间与空间。
+
+所有对上的子集之并指定了 $N$ 个未定元中一个次数至多 $K$ 的
+无平方单项式。计入该次数界的所有单项式，由隔板法给出上界
+$\binom{N+K}{K}$。因此该数组对应网络中的导线数 $M$ 满足
+\begin{align}
+ M &\le J^2+\log_2\prod_{g,h} C_{gh}
+      \le J^2+\log_2\binom{N+K}{K} \notag\\
+   &\le J^2+K\log_2\!\left(\frac{\mathrm e(N+K)}{K}\right)
+      = O_{k,c}(n\nu).
+ \label{eq:sharp-wire-budget}
+\end{align}
+这里 $K=\Theta_{k,c}(n)$ 且 $N\le n\lambda^{O_{k,c}(1)}$。
+又 $\lceil\log_2 C_{gh}\rceil\le N_{gh}$，故每个顶点的度至多为
+其关联数 $n^{3/4}\lambda^{O_{k,c}(1)}$。
+
+\paragraph{张量元素与收缩。}
+导线比特的一个有效赋值在每个检验处确定一个子集
+$S_i\subseteq I_i$。记 $z_{i,S_i}=\prod_{v\in S_i}z_{iv}$。检验组
+$g$ 处的元素是其所指单项式在
+$\prod_{i\in\mathcal T_g}\overline B_i(z_i,V)$ 中的系数。由于各
+$z_i$ 互不相交，这等于
+\[
+ \prod_{i\in\mathcal T_g}[z_{i,S_i}]\overline B_i(z_i,V)
+ \qquad\text{在 }\mathcal B\text{ 中}.
+\]
+对变量组 $h$，对 $v\in\mathcal X_h$ 令 $b_v=|\{i:v\in S_i\}|$。
+其元素为
+\[
+ \sum_{x\in\{0,1\}^{\mathcal X_h}}
+        \prod_{v\in\mathcal X_h}x_v^{b_v}
+   =2^{|\{v\in\mathcal X_h:b_v=0\}|}\pmod{2^p}.
+\]
+确实，正指数要求 $x_v=1$，而零指数使 $x_v$ 自由。这包括
+所有检验作用域之外的变量。
+
+$F$ 的每个单项式恰好出现在一个数组中，并在每个组对处恰有
+一个有效索引。它在 $F$ 中的系数是各检验组系数之积。在把具有
+相同 $v$ 的关联设为相等之后，其在布尔赋值上的和是各变量组
+元素之积。由 \eqref{eq:sharp-incidence-degree}，对这些数组
+求和穷尽了所有单项式。从而 \eqref{eq:sharp-branch-residue}
+中 $\mathcal S_\ell$ 内 $\mathcal B$ 的元素是这些二部网络的
+收缩之和。
+
+为计算一个检验侧系数，设 $\mathbf1_T$ 为 $I_i$ 上支撑集为
+$T\subseteq S_i$ 的布尔向量。在 $\mathbf1_T$ 处，该多线性
+多项式的值等于其以下标为 $T$ 的子集所索引的系数之和，且
+在该处与 $B_i$ 一致。反解此子集和给出
+\[
+ [z_{i,S_i}]\overline B_i(z_i,V)=
+ \sum_{T\subseteq S_i}(-1)^{|S_i|-|T|}B_i(\mathbf1_T,V)
+ \qquad\text{在 }\mathcal B\text{ 中}.
+\]
+每一项花费多项式多个位运算。由所列单项式计算
+$\widetilde L_i(\mathbf1_T)$，并使用引理~\ref{lem:rational-idempotent}
+中的多项式 $e_j$，它们可在多项式时间内构造。存储
+$B_i(\mathbf1_T,V)$ 的 $\ell$ 个系数模 $2^p$。至多有
+$2^{|S_i|}\le 2^{k\lambda^c}$ 个子集需要处理。每次累加一个
+检验，并在组内于 $\mathcal B$ 中乘起所得系数。这以
+$2^{\lambda^{O_{k,c}(1)}}$ 位运算与多项式空间计算一个检验组
+元素。变量侧元素与无效导线索引的检查花费多项式时间。
+图、次数数组与元素计算过程的描述具有多项式大小。
+
+以规模参数 $s=n\nu$、根精度 $p=n+1$ 与截断阶 $\ell=n+1$
+应用定理~\ref{thm:tensor-contraction}。由
+\eqref{eq:sharp-wire-budget}，该图有 $2J$ 个顶点与
+$O_{k,c}(s)$ 条导线。对所有充分大的 $n$，其最大度至多为
+$\lceil s^{9/10}\rceil$，其精度与截断阶为 $O(s)$，其元素计算
+时间至多为 $2^{O_{k,c}(s^{9/10})}$。每次收缩随后花费
+$n^{O_{k,c}(1)}2^{O_{k,c}(s/\sqrt{\log s})}$ 位运算与多项式
+空间。这里 $s/\sqrt{\log s}=O(n\nu/\sqrt\lambda)$。
+高关联分支与次数数组至多把运行时间乘以
+\[
+ 2^{\,n/\sqrt{\lambda}+O_{k,c}(\sqrt n\log n)}.
+\]
+该指数中的两项均为 $O_{k,c}(n\nu/\sqrt{\lambda})$。
+顺序处理各分支与数组。在每个分支上，于 $\mathcal B$ 中
+求和各收缩并应用 $\mathcal S_\ell$。模 $2^{n+1}$ 相加各分支
+剩余即得原计数，因为它介于 $0$ 与 $2^n$ 之间。这证明了
+所声称的界，其中有界例外规模采用直接枚举。
+\end{proof}
+
+\begin{proof}[定理~\ref{thm:main} 中任意密度界的证明]
+如第~\ref{subsec:general-reduction} 节那样，在其原始 $n$ 个
+声明变量上规范化该公式。空子句与不含子句的公式有直接
+答案。对 $n\ge20$，取
+$\sigma=1/\lceil\sqrt{\lambda}\rceil$ 应用引理~\ref{lem:sparsify}，
+其中 $\lambda=\lceil\log_2 n\rceil$。该树有
+$n^{O_k(1)}2^{O(n/\sqrt{\lambda})}$ 个节点与多项式深度。
+每个叶子的出现次数界为
+$B=O_k((\sigma^{-1}\log(2/\sigma))^{k-1})=\lambda^{O_k(1)}$，
+且至多有 $Bn$ 个非空子句。
+
+对于具有 $m_G$ 个子句的非平凡叶子，使用
+引理~\ref{lem:sparse-checks} 的初始奇偶检验与
+引理~\ref{lem:greedy-hashes} 的贪心过程。每个初始行的
+支撑大小至多为 $D_0$，每个附加行的列表长度为 $P$。
+两个界均为 $\lambda^{O_k(1)}$。由 \eqref{eq:hash-query}，每行
+给出一个次数至多 $k$、至多含 $2^k\max\{P,D_0\}$ 个单项式的
+方程，且每个被查询的系统至多有 $6n$ 个方程。对充分大的
+$n$，单个常数 $c=c(k)$ 同时界定方程与变量之比以及单项式
+界中 $\lambda$ 的指数。在每个贪心步骤，使用
+引理~\ref{lem:tensor-sparse-query} 对每个候选行 $h_\gamma$ 计算
+$N(A;h_\gamma)$，并追加取得最小值的一行。该求值器也适用于
+被丢弃的候选，其系统仍接受非满足赋值。最后一次调用给出
+所选矩阵的 $N(A)$，由引理~\ref{lem:greedy-hashes} 它等于
+叶子计数。
+
+构造初始检验与枚举候选（除求值之外）花费
+$2^{\lambda^{O_k(1)}}$ 位运算。每个叶子至多有
+$3n(2m_G)^P+1=2^{\lambda^{O_k(1)}}$ 次求值。由于 $\lambda$ 的
+每个固定幂次都是 $o(n\log\log n/\sqrt{\log n})$，这些开销
+与叶子数目被所声称的时间界
+\[
+ (n+m)^{O_k(1)}2^{O_k(n\log\log n/\sqrt{\log n})}
+\]
+吸收。这里 $m$ 计输入子句数。深度优先遍历该树，每次处理
+一个查询。各叶子的解集互不相交，因此其精确计数用一个
+$(n+1)$ 比特的累加器相加。结合每个查询与每条树路径的
+多项式空间，这给出所断言的多项式空间界。
+\end{proof}
+
+单个算法同时达到这两个界。取
+$\lambda=\lceil\log_2 n\rceil$ 与 $\nu=\lceil\log_2\lambda\rceil$，
+当 $m\le n\nu$ 时使用子句网络，否则使用奇偶查询。在第一个
+分支中 $n\le s=n+m=O(n\log\log n)$，因此即使在增长的密度下
+其指数也是 $O_k(n\log\log n/\sqrt{\log n})$。对每个固定 $D$ 与
+所有充分大的 $n$，每个满足 $m\le Dn$ 的输入都走该分支且
+$s=O_D(n)$。
